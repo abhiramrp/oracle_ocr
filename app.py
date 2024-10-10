@@ -1,18 +1,9 @@
 import os
-import oci 
-
-from oci.ai_document import AIServiceDocumentClient
-from oci.ai_document.models import AnalyzeDocumentDetails
 
 from flask import Flask, request, redirect, url_for, render_template, flash
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-'''
-config = oci.config.from_file()
-
-ai_document_client = AIServiceDocumentClient(config)
-'''
 
 app.config['UPLOAD_FOLDER'] = 'uploads/'  # Folder to store uploaded files
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Max upload size (16 MB)
@@ -46,6 +37,8 @@ def analyze_document():
         filename = secure_filename(file.filename)  # Sanitize the filename
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return f"File {filename} uploaded successfully!"
+      
+      
     
     return redirect(url_for('index'))
 
