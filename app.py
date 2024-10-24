@@ -3,6 +3,8 @@ import os
 from flask import Flask, request, redirect, url_for, render_template, flash
 from werkzeug.utils import secure_filename
 
+from oracle_functs import process_with_oci
+
 app = Flask(__name__)
 
 app.config['UPLOAD_FOLDER'] = 'uploads/'  # Folder to store uploaded files
@@ -35,41 +37,9 @@ def analyze_document():
         
       if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)  # Sanitize the filename
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return f"File {filename} uploaded successfully!"
-      
-      
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+        r = process_with_oci(file_path)
+        return f"File {filename} uploaded successfully! {r}"
     
     return redirect(url_for('index'))
-
-
-# https://docs.oracle.com/en-us/iaas/api/#/en/document-understanding/20221109/ProcessorJob/CreateProcessorJob
-
-'''
-@app.route('/analyze-document', methods=['POST'])
-def analyze_document():
-    if 'file' not in request.files:
-      flash('No file part')
-      return redirect(request.url)
-
-    try:
-      # Get the file from the request
-      file = request.files['document']
-      document_content = file.read()
-
-      # Prepare the AnalyzeDocumentDetails payload
-      document_details = AnalyzeDocumentDetails(
-        features=["TEXT_EXTRACTION"],
-        document={"source": "RAW_TEXT", "content": document_content}
-      )
-
-      # Call the Document Understanding API
-      response = ai_document_client.analyze_document(analyze_document_details=document_details)
-
-      # Return the analysis result as JSON
-      return jsonify(response.data), 200
-    
-    except Exception as e:
-      return jsonify({"error": str(e)}), 500
-
-'''

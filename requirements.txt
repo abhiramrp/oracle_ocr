@@ -2,3 +2,5 @@ Flask
 python-dotenv
 oci
 Flask-WTF
+requests
+responses
